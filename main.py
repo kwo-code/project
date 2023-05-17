@@ -63,7 +63,7 @@ class Ball(GameSprite):
         if self.rect.y >= screen_h:
             restart = True
             score_1 += 1
-        if restart == True:
+        if restart:
             self.rect.x = screen_w/2-5
             self.rect.y = screen_h/2
 
@@ -92,7 +92,7 @@ while True:
             if restart == True:
                 restart = False
 
-    if pause == False:
+    if not pause:
         balls.update()
     
     if  keys_pressed[K_a] and p_y_1>0 and pause == False:
@@ -100,14 +100,14 @@ while True:
     if keys_pressed[K_d] and p_y_1<360 and pause == False:
         p_y_1 += 5+speed_bonus
 
-    if restart == True:
+    if restart:
         b_left, b_up = True, False
         pause = False
         speed_bonus = 0
         screen.blit(pause_text, (screen_w/2-55,screen_h-25))
         p_y_1,p_y_2 = screen_w/2-15,screen_w/2-15
 
-    if pause == True:
+    if pause:
         screen.blit(pause_text, (screen_w/2-55,screen_h-25)) 
 
     statistic = medium_font.render(f'{score_1} : {score_2}', True, (255,255,255))
