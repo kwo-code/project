@@ -137,6 +137,9 @@ while True:
     statistic = medium_font.render(f'{score_1} : {score_2}', True, (COLOR))
     screen.blit(statistic, (20,20))
 
+    #help = medium_font.render('A - left D - right', True, (COLOR))
+    #screen.blit(help, (220,20))
+
     for particle in particles:
         particle.update()
         particle.draw()
