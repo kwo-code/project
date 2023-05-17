@@ -28,7 +28,7 @@ class Particle:
         self.x = x
         self.y = y
         self.color = color
-        self.size = random.randint(3, 5)
+        self.size = random.randint(1, 4)
         self.speed_x = random.uniform(-1, 1)
         self.speed_y = random.uniform(-1, 1)
 
@@ -64,24 +64,27 @@ class Ball(GameSprite):
             self.rect.y -= 2+speed_bonus
         if b_up == False and pause == False and restart == False:
             self.rect.y += 2+speed_bonus
+
         if sprite.spritecollide(player, balls, False):
             b_up = True
-            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
             speed_bonus += 0.001
+            self.create_particles()
         if sprite.spritecollide(bot, balls, False):
             b_up = False
-            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
             speed_bonus += 0.001
+            self.create_particles()
+
         if p_y_2 > (self.rect.x + random.randint(0, 7)) and p_y_2>0 and pause == False and self.rect.y < 200:
             p_y_2 -= 2+speed_bonus
         if p_y_2 < (self.rect.x + random.randint(0, 7)) and p_y_2<360 and pause == False and self.rect.y < 200:
             p_y_2 += 2+speed_bonus
         if self.rect.x <= 0:
             b_left = False
-            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
+            self.create_particles()
         if self.rect.x >= screen_w-15:
             b_left = True
-            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
+            self.create_particles()
+            
         if self.rect.y <= 0:
             restart = True                
             score_2 += 1
@@ -91,6 +94,11 @@ class Ball(GameSprite):
         if restart:
             self.rect.x = screen_w/2-5
             self.rect.y = screen_h/2
+
+    def create_particles(self):
+        for x in range(0, random.randint(2, 6)):
+                particles.append(Particle(self.rect.x, self.rect.y,COLOR))
+
 
 pause,restart = False,True
 
