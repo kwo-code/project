@@ -7,7 +7,7 @@ font.init()
 display.set_icon(image.load("data/images/ico.bmp"))
 display.set_caption('Pin Pong')
 
-b_left, b_up = True, True
+b_left, b_up = False, False
 speed_bonus = 0
 
 balls = sprite.Group()
@@ -21,7 +21,6 @@ background = transform.scale(image.load('data/images/background.jpg'),(screen_w,
 screen = display.set_mode((screen_w, screen_h))
 clock = time.Clock()
 FPS = 60
-
 COLOR = (255,255,255)
 
 class Particle:
@@ -73,9 +72,9 @@ class Ball(GameSprite):
             b_up = False
             particles.append(Particle(self.rect.x, self.rect.y,COLOR))
             speed_bonus += 0.001
-        if p_y_2 > self.rect.x and p_y_2>0 and pause == False and self.rect.y < 200:
+        if p_y_2 > (self.rect.x + random.randint(0, 7)) and p_y_2>0 and pause == False and self.rect.y < 200:
             p_y_2 -= 2+speed_bonus
-        if p_y_2 < self.rect.x and p_y_2<360 and pause == False and self.rect.y < 200:
+        if p_y_2 < (self.rect.x + random.randint(0, 7)) and p_y_2<360 and pause == False and self.rect.y < 200:
             p_y_2 += 2+speed_bonus
         if self.rect.x <= 0:
             b_left = False
@@ -127,7 +126,6 @@ while True:
         p_y_1 += 5+speed_bonus
 
     if restart:
-        b_left, b_up = True, False
         pause = False
         speed_bonus = 0
         screen.blit(pause_text, (screen_w/2-55,screen_h-25))
