@@ -1,10 +1,11 @@
 from pygame import *
-
-display.set_icon(image.load("data/images/ico.bmp"))
-display.set_caption('Pin Pong')
+import random
 
 init()
 font.init()
+
+display.set_icon(image.load("data/images/ico.bmp"))
+display.set_caption('Pin Pong')
 
 b_left, b_up = True, True
 speed_bonus = 0
@@ -20,6 +21,27 @@ background = transform.scale(image.load('data/images/background.jpg'),(screen_w,
 screen = display.set_mode((screen_w, screen_h))
 clock = time.Clock()
 FPS = 60
+
+COLOR = (255,255,255)
+
+class Particle:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.size = random.randint(3, 5)
+        self.speed_x = random.uniform(-1, 1)
+        self.speed_y = random.uniform(-1, 1)
+
+    def update(self):
+        self.x += self.speed_x
+        self.y += self.speed_y
+        self.size -= 0.1
+
+    def draw(self):
+        draw.circle(screen, self.color, (int(self.x), int(self.y)), int(self.size))
+
+particles = []
 
 class GameSprite(sprite.Sprite):
     def __init__(self, image, x, y, speed):
@@ -45,9 +67,11 @@ class Ball(GameSprite):
             self.rect.y += 2+speed_bonus
         if sprite.spritecollide(player, balls, False):
             b_up = True
+            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
             speed_bonus += 0.001
         if sprite.spritecollide(bot, balls, False):
             b_up = False
+            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
             speed_bonus += 0.001
         if p_y_2 > self.rect.x and p_y_2>0 and pause == False and self.rect.y < 200:
             p_y_2 -= 2+speed_bonus
@@ -55,8 +79,10 @@ class Ball(GameSprite):
             p_y_2 += 2+speed_bonus
         if self.rect.x <= 0:
             b_left = False
+            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
         if self.rect.x >= screen_w-15:
             b_left = True
+            particles.append(Particle(self.rect.x, self.rect.y,COLOR))
         if self.rect.y <= 0:
             restart = True                
             score_2 += 1
@@ -110,8 +136,14 @@ while True:
     if pause:
         screen.blit(pause_text, (screen_w/2-55,screen_h-25)) 
 
-    statistic = medium_font.render(f'{score_1} : {score_2}', True, (255,255,255))
+    statistic = medium_font.render(f'{score_1} : {score_2}', True, (COLOR))
     screen.blit(statistic, (20,20))
+
+    for particle in particles:
+        particle.update()
+        particle.draw()
+
+    particles = [particle for particle in particles if particle.size > 0]
 
     player.reset()
     bot.reset()
