@@ -63,32 +63,32 @@ class GameSprite(sprite.Sprite):
 
 class Ball(GameSprite):
     def update(self):
-        global speed_bonus,rebound_1,keys_pressed
+        global rebound_1,keys_pressed
         if c.b_left == True and c.pause == False and c.restart == False:
-            self.rect.x -= 2+speed_bonus
+            self.rect.x -= c.ball_speed+c.speed_bonus
         if c.b_left == False and c.pause == False and c.restart == False:
-            self.rect.x += 2+speed_bonus
+            self.rect.x += c.ball_speed+c.speed_bonus
         if c.b_up == True and c.pause == False and c.restart == False:
-            self.rect.y -= 2+speed_bonus
+            self.rect.y -= c.ball_speed+c.speed_bonus
         if c.b_up == False and c.pause == False and c.restart == False:
-            self.rect.y += 2+speed_bonus
+            self.rect.y += c.ball_speed+c.speed_bonus
 
         if sprite.spritecollide(player, balls, False):
             c.b_up = True
-            speed_bonus += 0.001
+            c.speed_bonus += c.sped_up
             rebound_2.play()
             self.create_particles()
 
         if sprite.spritecollide(bot, balls, False):
             c.b_up = False
-            speed_bonus += 0.001
+            c.speed_bonus += c.sped_up
             rebound_2.play()
             self.create_particles()
 
-        if c.player2_y > (self.rect.x + random.randint(0, 10)) and c.player2_y>0 and c.pause == False and self.rect.y < 200:
-            c.player2_y -= 2+speed_bonus
-        if c.player2_y < (self.rect.x + random.randint(0, 10)) and c.player2_y<360 and c.pause == False and self.rect.y < 200:
-            c.player2_y += 2+speed_bonus
+        if c.player2_y > (self.rect.x + random.randint(-10, 10)) and c.player2_y>0 and c.pause == False and self.rect.y < 200:
+            c.player2_y -= 2+c.speed_bonus
+        if c.player2_y < (self.rect.x + random.randint(-10, 10)) and c.player2_y<360 and c.pause == False and self.rect.y < 200:
+            c.player2_y += 2+c.speed_bonus
         if self.rect.x <= 0:
             c.b_left = False
             rebound_1.play()
@@ -139,19 +139,19 @@ while True:
     current_time = time.get_ticks()
     
     if  keys_pressed[K_a] and c.player1_y>0 and c.pause == False:
-        c.player1_y -= 5+speed_bonus
+        c.player1_y -= 5+c.speed_bonus
     if keys_pressed[K_d] and c.player1_y<360 and c.pause == False:
-        c.player1_y += 5+speed_bonus
+        c.player1_y += 5+c.speed_bonus
 
     if c.restart:
         if current_time - last_blink_time >= blink_interval:
             show_text = not show_text  # Инвертируем видимость текста
             last_blink_time = current_time
         c.pause = False
-        speed_bonus = 0
+        c.speed_bonus = 0
         c.player1_y,c.player2_y = c.screen_w/2-15,c.screen_w/2-15
-        c.pause = random.choice([True, False])
-        c.restart = random.choice([True, False])
+        c.b_up = random.choice([True, False])
+        c.b_left = random.choice([True, False])
         if show_text:
             text_rect = pause_text.get_rect(center=(c.screen_w/2,c.screen_h-25))
             screen.blit(pause_text, text_rect)
