@@ -3,6 +3,7 @@ import random
 
 init()
 font.init()
+mixer.init()
 
 display.set_icon(image.load("data/images/ico.bmp"))
 display.set_caption('Pin Pong')
@@ -20,8 +21,13 @@ screen_w,screen_h = 400,550
 background = transform.scale(image.load('data/images/background.jpg'),(screen_w, screen_h))
 screen = display.set_mode((screen_w, screen_h))
 clock = time.Clock()
+
 FPS = 60
 COLOR = (255,255,255)
+rebound_1 = mixer.Sound('data/sfx/rebound_1.wav')
+rebound_2 = mixer.Sound('data/sfx/rebound_2.wav')
+rebound_1.set_volume(0.7)
+rebound_2.set_volume(0.6)
 
 class Particle:
     def __init__(self, x, y, color):
@@ -55,7 +61,7 @@ class GameSprite(sprite.Sprite):
 
 class Ball(GameSprite):
     def update(self):
-        global b_left, b_up, speed_bonus, restart, score_1, score_2, p_y_1, p_y_2
+        global b_left, b_up, speed_bonus, restart, score_1, score_2, p_y_1, p_y_2, rebound_1
         if b_left == True and pause == False and restart == False:
             self.rect.x -= 2+speed_bonus
         if b_left == False and pause == False and restart == False:
@@ -68,10 +74,12 @@ class Ball(GameSprite):
         if sprite.spritecollide(player, balls, False):
             b_up = True
             speed_bonus += 0.001
+            rebound_2.play()
             self.create_particles()
         if sprite.spritecollide(bot, balls, False):
             b_up = False
             speed_bonus += 0.001
+            rebound_2.play()
             self.create_particles()
 
         if p_y_2 > (self.rect.x + random.randint(0, 7)) and p_y_2>0 and pause == False and self.rect.y < 200:
@@ -80,11 +88,13 @@ class Ball(GameSprite):
             p_y_2 += 2+speed_bonus
         if self.rect.x <= 0:
             b_left = False
+            rebound_1.play()
             self.create_particles()
         if self.rect.x >= screen_w-15:
             b_left = True
+            rebound_1.play()
             self.create_particles()
-            
+
         if self.rect.y <= 0:
             restart = True                
             score_2 += 1
