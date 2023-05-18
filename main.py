@@ -1,5 +1,6 @@
 from pygame import *
 import random
+import ctypes
 
 from data import config as c
 
@@ -9,6 +10,9 @@ mixer.init()
 
 display.set_icon(image.load("data/images/ico.bmp"))
 display.set_caption(c.caption)
+
+myappid = 'pygame_pinpong'  # Замените на уникальный идентификатор вашей игры
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 balls = sprite.Group()
 particles = []
@@ -59,7 +63,7 @@ class GameSprite(sprite.Sprite):
 
 class Ball(GameSprite):
     def update(self):
-        global speed_bonus,p_y_1, p_y_2, rebound_1
+        global speed_bonus,rebound_1,keys_pressed
         if c.b_left == True and c.pause == False and c.restart == False:
             self.rect.x -= 2+speed_bonus
         if c.b_left == False and c.pause == False and c.restart == False:
@@ -74,16 +78,17 @@ class Ball(GameSprite):
             speed_bonus += 0.001
             rebound_2.play()
             self.create_particles()
+
         if sprite.spritecollide(bot, balls, False):
             c.b_up = False
             speed_bonus += 0.001
             rebound_2.play()
             self.create_particles()
 
-        if p_y_2 > (self.rect.x + random.randint(0, 7)) and p_y_2>0 and c.pause == False and self.rect.y < 200:
-            p_y_2 -= 2+speed_bonus
-        if p_y_2 < (self.rect.x + random.randint(0, 7)) and p_y_2<360 and c.pause == False and self.rect.y < 200:
-            p_y_2 += 2+speed_bonus
+        if c.player2_y > (self.rect.x + random.randint(0, 10)) and c.player2_y>0 and c.pause == False and self.rect.y < 200:
+            c.player2_y -= 2+speed_bonus
+        if c.player2_y < (self.rect.x + random.randint(0, 10)) and c.player2_y<360 and c.pause == False and self.rect.y < 200:
+            c.player2_y += 2+speed_bonus
         if self.rect.x <= 0:
             c.b_left = False
             rebound_1.play()
@@ -107,13 +112,11 @@ class Ball(GameSprite):
         for x in range(0, random.randint(2, 6)):
                 particles.append(Particle(self.rect.x, self.rect.y,c.main_color))
 
-p_y_1,p_y_2 = c.screen_w/2-15,c.screen_w/2-15
-
 ball = balls.add(Ball(transform.scale(image.load('data/images/block.jpg'),(10, 10)), c.screen_w/2-5, c.screen_h/2, 15))
 
 while True:
-    player = GameSprite(transform.scale(image.load('data/images/block.jpg'),(35, 5)), p_y_1, c.screen_h-50, 15)
-    bot = GameSprite(transform.scale(image.load('data/images/block.jpg'),(35, 5)), p_y_2, 50, 15)
+    player = GameSprite(transform.scale(image.load('data/images/block.jpg'),(35, 5)), c.player1_y, c.screen_h-50, 15)
+    bot = GameSprite(transform.scale(image.load('data/images/block.jpg'),(35, 5)), c.player2_y, 50, 15)
 
     keys_pressed = key.get_pressed()
     screen.blit(background,(0, 0))
@@ -126,36 +129,40 @@ while True:
             if c.pause == False and c.restart == False:
                 c.pause = True
             else:
-                pause = False
+                c.pause = False
             if c.restart == True:
                 c.restart = False
-
-    current_time = time.get_ticks()
-    if current_time - last_blink_time >= blink_interval:
-        show_text = not show_text  # Инвертируем видимость текста
-        last_blink_time = current_time
-
+    
     if not c.pause:
         balls.update()
+
+    current_time = time.get_ticks()
     
-    if  keys_pressed[K_a] and p_y_1>0 and c.pause == False:
-        p_y_1 -= 5+speed_bonus
-    if keys_pressed[K_d] and p_y_1<360 and c.pause == False:
-        p_y_1 += 5+speed_bonus
+    if  keys_pressed[K_a] and c.player1_y>0 and c.pause == False:
+        c.player1_y -= 5+speed_bonus
+    if keys_pressed[K_d] and c.player1_y<360 and c.pause == False:
+        c.player1_y += 5+speed_bonus
 
     if c.restart:
+        if current_time - last_blink_time >= blink_interval:
+            show_text = not show_text  # Инвертируем видимость текста
+            last_blink_time = current_time
         c.pause = False
         speed_bonus = 0
-        p_y_1,p_y_2 = c.screen_w/2-15,c.screen_w/2-15
+        c.player1_y,c.player2_y = c.screen_w/2-15,c.screen_w/2-15
+        c.pause = random.choice([True, False])
+        c.restart = random.choice([True, False])
         if show_text:
             text_rect = pause_text.get_rect(center=(c.screen_w/2,c.screen_h-25))
             screen.blit(pause_text, text_rect)
 
     if c.pause:
+        if current_time - last_blink_time >= blink_interval:
+            show_text = not show_text  # Инвертируем видимость текста
+            last_blink_time = current_time
         if show_text:
             text_rect = pause_text.get_rect(center=(c.screen_w/2,c.screen_h-25))
             screen.blit(pause_text, text_rect)
-
 
     statistic = medium_font.render(f'{c.score_1} : {c.score_2}', True, (c.main_color))
     screen.blit(statistic, (20,20))
