@@ -11,8 +11,7 @@ mixer.init()
 display.set_icon(image.load("data/images/ico.bmp"))
 display.set_caption(c.caption)
 
-myappid = 'pygame_pinpong'  # Замените на уникальный идентификатор вашей игры
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(c.myappid)
 
 balls = sprite.Group()
 particles = []
@@ -85,10 +84,6 @@ class Ball(GameSprite):
             rebound_2.play()
             self.create_particles()
 
-        if c.player2_y > (self.rect.x + random.randint(-10, 10)) and c.player2_y>0 and c.pause == False and self.rect.y < 200:
-            c.player2_y -= 2+c.speed_bonus
-        if c.player2_y < (self.rect.x + random.randint(-10, 10)) and c.player2_y<360 and c.pause == False and self.rect.y < 200:
-            c.player2_y += 2+c.speed_bonus
         if self.rect.x <= 0:
             c.b_left = False
             rebound_1.play()
@@ -98,12 +93,18 @@ class Ball(GameSprite):
             rebound_1.play()
             self.create_particles()
 
-        if self.rect.y <= 0:
+        if c.player2_y > (self.rect.x + random.randint(-10, 10)) and c.player2_y>0 and c.pause == False and self.rect.y < 200:
+            c.player2_y -= 2+c.speed_bonus
+        if c.player2_y < (self.rect.x + random.randint(-10, 10)) and c.player2_y<360 and c.pause == False and self.rect.y < 200:
+            c.player2_y += 2+c.speed_bonus
+
+        if self.rect.y >= c.screen_h:
             c.restart = True                
             c.score_2 += 1
-        if self.rect.y >= c.screen_h:
+        if self.rect.y <= 0:
             c.restart = True
             c.score_1 += 1
+            
         if c.restart:
             self.rect.x = c.screen_w/2-5
             self.rect.y = c.screen_h/2
@@ -140,7 +141,7 @@ while True:
     
     if  keys_pressed[K_a] and c.player1_y>0 and c.pause == False:
         c.player1_y -= 5+c.speed_bonus
-    if keys_pressed[K_d] and c.player1_y<360 and c.pause == False:
+    if keys_pressed[K_d] and c.player1_y<370 and c.pause == False:
         c.player1_y += 5+c.speed_bonus
 
     if c.restart:
