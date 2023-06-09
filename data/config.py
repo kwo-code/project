@@ -4,6 +4,7 @@ FPS = 60
 main_color = (255,255,255)
 screen_w = 400
 screen_h = 550
+myappid = "Pin pong"
 
 player1_y = screen_w/2-15
 player2_y = screen_w/2-15
